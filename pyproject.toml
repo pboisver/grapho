@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "grapho"
+version = "0.1.0"
+description = ""
+authors = ["pboisver <pboisver@umich.edu>"]
+readme = "README.md"
+packages = [{include = "grapho", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^7.4.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
