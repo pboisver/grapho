@@ -9,6 +9,8 @@ packages = [{include = "grapho", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 pytest = "^7.4.4"
+rdflib = "^7.0"
+loguru = "^0.7.2"
 
 
 [build-system]
