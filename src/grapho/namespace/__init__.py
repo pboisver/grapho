@@ -13,6 +13,8 @@ from rdflib.term import URIRef
 class AliasingDefinedNamespaceMeta(DefinedNamespaceMeta):
     _fail = True  # Default is closed namepaces only: fail if neither attribute nor in _extras
 
+    _alias: dict[str,str] = {}
+    
     _DFNS_RESERVED_ATTRS.add("_alias")
 
     def __getitem__(cls, name: str, default=None) -> URIRef:
@@ -23,10 +25,12 @@ class AliasingDefinedNamespaceMeta(DefinedNamespaceMeta):
 class AliasingDefinedNamespace(
     DefinedNamespace, metaclass=AliasingDefinedNamespaceMeta
 ):
-    """Shorthand for defined namespace classes that use aliases.
+    """Shorthand for defined namespace classes that use aliases. Derived namespace classes should be imported directly and not instantiated.
 
-    The base URI of the namespace is set using:
-    `_NS = Namespace("http://purl.obolibrary.org/obo/")`
+    The base URI of the namespace is set in the derived class using:
+    ```
+        _NS = Namespace("http://purl.obolibrary.org/obo/")
+    ```
 
     Terms should be added as class attributes of type `URIRef`:
     ```
@@ -49,8 +53,13 @@ class AliasingDefinedNamespace(
     pass
 
 
-from grapho.namespace._PSDO import (  # noqa: E402, import after to avoid circular dependency
-    PSDO,
-)
+# import at end to avoid circular reference when namespaces import `AliasingDefinedNamespace`
+from grapho.namespace._PSDO import PSDO   # noqa: E402
+from grapho.namespace._CPO import CPO  # noqa: E402
+from grapho.namespace._SLOWMO import SLOWMO  # noqa: E402
 
-_NAMESPACE_PREFIXES_PFP = {"psdo": PSDO}
+_NAMESPACE_PREFIXES_PFP = {
+    "psdo": PSDO,
+    "cpo": CPO,
+    "slowmo": SLOWMO
+    }

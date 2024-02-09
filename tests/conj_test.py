@@ -1,8 +1,8 @@
+import pytest
+from grapho.namespace import PSDO, AliasingDefinedNamespace
 from loguru import logger
 from rdflib import FOAF, RDF, ConjunctiveGraph, Graph, Literal, Namespace, URIRef
 from rdflib.plugins.stores.memory import Memory
-
-from grapho.namespace import PSDO
 
 
 def test_load_from_cp():
@@ -125,11 +125,42 @@ def test_alias():
 
     assert PSDO.PSDO_000124 == PSDO["PSDO_000124"]
     assert PSDO.PSDO_000125 == PSDO.baz
-    assert "foo" in PSDO
+    assert "http://purl.obolibrary.org/obo/foo" in PSDO
+    assert "bar" in PSDO
     assert "PSDO_000123" in PSDO
 
     assert Namespace("http://purl.obolibrary.org/obo/") == PSDO._NS
+    assert URIRef("http://purl.obolibrary.org/obo/foo") == PSDO._NS.foo
 
-    # assert URIRef('http://purl.obolibrary.org/obo/foo') == PSDO._NS.foo
+    with pytest.raises(Exception) as e_info:
+        PSDO.missing_term
+    assert e_info.type is AttributeError
+
+    PSDO._extras.append("missing_term")
+    try:
+        PSDO.missing_term
+    except AttributeError:
+        pytest.fail("Should not raise exception")
+
+
+class TEST_BOB(AliasingDefinedNamespace):
+    _NS = Namespace("http://bob.org/")
+
+    BOB_000123: URIRef
+    "alias: foo"
+    foo: URIRef
+    """alias for BOB_000123"""
+
+
+def test_more_aliases():
+    assert TEST_BOB.BOB_000123.n3() == "<http://bob.org/BOB_000123>"
+
+    assert TEST_BOB.foo.n3() == "<http://bob.org/foo>"
+
+    TEST_BOB._alias["bar"] = "foo"
+
+    assert TEST_BOB.bar.n3() == "<http://bob.org/foo>"
+    
+    TEST_BOB.foo
 
     pass
