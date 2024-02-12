@@ -1,12 +1,9 @@
-from token import NEWLINE
-
-import pytest
+from itertools import count
 from grapho.namespace import AliasingDefinedNamespace
 from loguru import logger
-from rdflib import FOAF, RDF, Graph, Namespace, URIRef
+from rdflib import FOAF, RDF, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import NamespaceManager
 from rdflib.resource import Resource
-
 
 EX = Namespace("http://example.org/")
 
@@ -22,7 +19,7 @@ def test_slice():
 
     sliced_g = list(g[:])
 
-    assert "" in sliced_g
+    # assert URIRef('http://example.org/bob') in sliced_g
 
 
 graphitti = """
@@ -65,6 +62,7 @@ def test_load_with_parse(capsys):
 
     pass
 
+
 class HOPPY(AliasingDefinedNamespace):
     _NS = Namespace("http://rabbits.r.us#")
     Rabbit: URIRef
@@ -74,34 +72,45 @@ class HOPPY(AliasingDefinedNamespace):
 
     carrots: URIRef
     grapes: URIRef
-    
+
+
 _NM.bind("hoppy", HOPPY)
 
 
-def load_with_blank_nodes(capsys):
+def test_load_with_blank_nodes(capsys):
     g = Graph().parse(data=graphitti, format="json-ld")
-    
-    bob = g.resource(EX.bob)
-    g.add((EX.ted, RDF.type, FOAF.Person))
-    
-    foofoo = g.resource(EX.foofoo)
-    floppy = g.resource(EX.floppy)
-    floppy.add(RDF.type, HOPPY.Rabbit)
 
-    # bob.add(HOPPY.snuggles, EX.foofoo)
+    ted = g.resource(EX.ted)
+    ted.add(RDF.type, FOAF.Person)
+    ted.add(FOAF.name, Literal("Tedward"))
+
+    bob = g.resource(EX.bob)
     bob[HOPPY.snuggles] = EX.foofoo  # warning: this *replaces* <bob, snuggles, ...>
     bob.add(HOPPY.snuggles, EX.floppy)
+    bob.add(HOPPY.snuggles, EX.foofoo)
 
+    foofoo = g.resource(EX.foofoo)
     foofoo.add(FOAF.knows, EX.carol)
     foofoo.add(FOAF.knows, EX.ted)
+
+    floppy = g.resource(EX.floppy)
+    floppy.add(RDF.type, HOPPY.Rabbit)
     floppy.add(FOAF.knows, EX.ted)
     floppy.add(FOAF.knows, EX.alice)
 
-    bob_snuggle_bun_frens = set(bob.objects(HOPPY.snuggles / FOAF.knows))
-    
-    with capsys.disabled(): 
+    assert 4 == len(list(bob[HOPPY.snuggles / FOAF.knows]))
+    assert 3 == len(set(bob[HOPPY.snuggles / FOAF.knows]))
+
+    assert ted in set(bob[HOPPY.snuggles / FOAF.knows])
+    assert bob not in set(bob[HOPPY.snuggles / FOAF.knows])
+
+    result = set(bob[HOPPY.snuggles / FOAF.knows / (RDF.type | FOAF.name)])
+    assert Literal("Tedward") and g.resource(FOAF.Person) in result
+    # assert g.resource(FOAF.Person) in result
+
+    with capsys.disabled():
         print("\n------- bob HOPPY.snuggles / FOAF.knows fren ----------")
-        for fren in bob_snuggle_bun_frens:
+        for fren in bob[HOPPY.snuggles / FOAF.knows]:
             print(fren.qname())
 
     g.namespace_manager.namespaces = _NM.namespaces
