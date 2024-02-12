@@ -1,7 +1,7 @@
 import pytest
 from grapho.namespace import PSDO, AliasingDefinedNamespace
 from loguru import logger
-from rdflib import FOAF, RDF, ConjunctiveGraph, Graph, Literal, Namespace, URIRef
+from rdflib import FOAF, RDF, XSD, ConjunctiveGraph, Graph, Literal, Namespace, URIRef
 from rdflib.plugins.stores.memory import Memory
 
 
@@ -160,7 +160,9 @@ def test_more_aliases():
     TEST_BOB._alias["bar"] = "foo"
 
     assert TEST_BOB.bar.n3() == "<http://bob.org/foo>"
-    
+
     TEST_BOB.foo
+
+    XSD.string
 
     pass
