@@ -1,9 +1,7 @@
-from itertools import count
 from grapho.namespace import AliasingDefinedNamespace
 from loguru import logger
 from rdflib import FOAF, RDF, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import NamespaceManager
-from rdflib.resource import Resource
 
 EX = Namespace("http://example.org/")
 
@@ -16,10 +14,6 @@ def test_slice():
     g.add((EX.bob, RDF.type, FOAF.Person))
 
     logger.info(g.serialize(format="json-ld", auto_compact=True))
-
-    sliced_g = list(g[:])
-
-    # assert URIRef('http://example.org/bob') in sliced_g
 
 
 graphitti = """
@@ -66,8 +60,26 @@ def test_load_with_parse(capsys):
 class HOPPY(AliasingDefinedNamespace):
     _NS = Namespace("http://rabbits.r.us#")
     Rabbit: URIRef
+    """a rabbit"""
 
     snuggles: URIRef
+    munches: URIRef
+
+    carrots: URIRef
+    grapes: URIRef
+    
+class PSDO(AliasingDefinedNamespace):
+    _NS = Namespace("http://rabbits.r.us#")
+    Rabbit: URIRef
+
+    PSDO_000123: URIRef
+    pos_gap: URIRef
+    """alias for PSDO_000123"""
+    
+    _alias = {
+        'pos_gap': 'PSDO_000123'
+    }
+    
     munches: URIRef
 
     carrots: URIRef
@@ -85,9 +97,9 @@ def test_load_with_blank_nodes(capsys):
     ted.add(FOAF.name, Literal("Tedward"))
 
     bob = g.resource(EX.bob)
-    bob[HOPPY.snuggles] = EX.foofoo  # warning: this *replaces* <bob, snuggles, ...>
     bob.add(HOPPY.snuggles, EX.floppy)
     bob.add(HOPPY.snuggles, EX.foofoo)
+    # bob[HOPPY.snuggles] = EX.foofoo  # warning: this *replaces* <bob, snuggles, ...>
 
     foofoo = g.resource(EX.foofoo)
     foofoo.add(FOAF.knows, EX.carol)
@@ -108,6 +120,8 @@ def test_load_with_blank_nodes(capsys):
     assert Literal("Tedward") and g.resource(FOAF.Person) in result
     # assert g.resource(FOAF.Person) in result
 
+    gap = g.resource(PSDO.pos_gap)
+    
     with capsys.disabled():
         print("\n------- bob HOPPY.snuggles / FOAF.knows fren ----------")
         for fren in bob[HOPPY.snuggles / FOAF.knows]:
@@ -117,7 +131,7 @@ def test_load_with_blank_nodes(capsys):
 
     with capsys.disabled():
         print("------- g: Graph (format='n3') ----------")
-        print(g.serialize())
+        print(g.serialize(format="n3", auto_compact=True))
         print("------- g: Graph (format='json-ld', auto_compact=True) ----------")
         # print(g.serialize(format='json-ld', auto_compact=True))
 
