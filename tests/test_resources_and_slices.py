@@ -1,6 +1,6 @@
 from grapho.namespace import AliasingDefinedNamespace
 from loguru import logger
-from rdflib import FOAF, RDF, Graph, Literal, Namespace, URIRef
+from rdflib import FOAF, RDF, BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import NamespaceManager
 
 EX = Namespace("http://example.org/")
@@ -136,3 +136,17 @@ def test_load_with_blank_nodes(capsys):
         # print(g.serialize(format='json-ld', auto_compact=True))
 
     pass
+
+
+def test_paths():
+    
+    bnode: BNode = BNode('foo')
+    
+    assert URIRef(bnode) == URIRef('foo')
+    assert bnode.n3() == '_:foo'
+    assert str(bnode) == 'foo'
+    assert bnode == BNode("foo")  # value object semantics for ==
+    assert bnode is not BNode("foo")  # value object semantics for ==
+    assert URIRef('foo') is not URIRef('foo')  # different instances
+    assert URIRef(BNode("foo")) == URIRef("foo")    
+    assert BNode('foo') == BNode(URIRef('foo'))
