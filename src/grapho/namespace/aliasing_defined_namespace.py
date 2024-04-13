@@ -2,6 +2,7 @@
 
 `AliasingDefinedNamespace` base class, and `PSDO`, `CPO`, and `SLOWMO` namespaces. These namespaces work the same way as the builtin RDF classes but allow for convenient aliases (e.g. labels) in code.
 """
+
 from rdflib.namespace import (
     _DFNS_RESERVED_ATTRS,
     DefinedNamespace,

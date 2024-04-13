@@ -17,7 +17,7 @@ def perf_info() -> Graph:
     return g
 
 
-class Comparison():
+class Comparison:
     def annotate(self, perf_content) -> Optional[Resource]:
         # TODO document why this method is empty
 
@@ -89,3 +89,51 @@ def test_with_cg():
 
     g = perf_info.serialize(format="nquads")
     logger.info(f"\n{g}")
+
+
+g1 = """
+{
+  "@context": {
+    "dc11": "http://purl.org/dc/elements/1.1/",
+    "ex": "http://example.org/vocab#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "ex:contains": { "@type": "@id"}
+  },
+  "@graph": [
+    {
+      "@id": "http://example.org/library",
+      "@type": "ex:Library",
+      "ex:contains": "http://example.org/library/the-republic"
+    },
+    {
+      "@id": "http://example.org/library/the-republic",
+      "@type": "ex:Book",
+      "dc11:creator": "Plato",
+      "dc11:title": "The Republic",
+      "ex:contains": ["http://example.org/library/the-republic#introduction",
+      "http://example.org/library/the-republic#Conclusion"]
+    },
+    {
+      "@id": "http://example.org/library/the-republic#introduction",
+      "@type": "ex:Chapter",
+      "dc11:description": "An introductory chapter on The Republic.",
+      "dc11:title": "The Introduction"
+    }
+  ]
+}
+"""
+
+
+def test_type_id():
+    hasCar = URIRef("http://pfp.org/hasCar")
+    r: Resource = Graph().resource(BNode("Bob"))
+
+    r[RDF.type] = URIRef("http://pfp.org/Recipient")
+    r.add(hasCar, URIRef("http://pfp.org/Buick"))
+    r.add(hasCar, URIRef("http://pfp.org/Rabbit"))
+
+    # print(r.graph.serialize(format="json-ld", indent=2))
+
+    library = Graph().parse(data=g1, format="json-ld")
+
+    print(library.serialize(format="json-ld", indent=2, auto_compact=True))

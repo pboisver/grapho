@@ -1,6 +1,6 @@
 from grapho.namespace import AliasingDefinedNamespace
 from loguru import logger
-from rdflib import FOAF, RDF, BNode, Graph, Literal, Namespace, URIRef
+from rdflib import FOAF, RDF, RDFS, BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import NamespaceManager
 
 EX = Namespace("http://example.org/")
@@ -67,7 +67,8 @@ class HOPPY(AliasingDefinedNamespace):
 
     carrots: URIRef
     grapes: URIRef
-    
+
+
 class PSDO(AliasingDefinedNamespace):
     _NS = Namespace("http://rabbits.r.us#")
     Rabbit: URIRef
@@ -75,11 +76,9 @@ class PSDO(AliasingDefinedNamespace):
     PSDO_000123: URIRef
     pos_gap: URIRef
     """alias for PSDO_000123"""
-    
-    _alias = {
-        'pos_gap': 'PSDO_000123'
-    }
-    
+
+    _alias = {"pos_gap": "PSDO_000123"}
+
     munches: URIRef
 
     carrots: URIRef
@@ -120,8 +119,8 @@ def test_load_with_blank_nodes(capsys):
     assert Literal("Tedward") and g.resource(FOAF.Person) in result
     # assert g.resource(FOAF.Person) in result
 
-    gap = g.resource(PSDO.pos_gap)
-    
+    # gap = g.resource(PSDO.pos_gap)
+
     with capsys.disabled():
         print("\n------- bob HOPPY.snuggles / FOAF.knows fren ----------")
         for fren in bob[HOPPY.snuggles / FOAF.knows]:
@@ -139,14 +138,38 @@ def test_load_with_blank_nodes(capsys):
 
 
 def test_paths():
-    
-    bnode: BNode = BNode('foo')
-    
-    assert URIRef(bnode) == URIRef('foo')
-    assert bnode.n3() == '_:foo'
-    assert str(bnode) == 'foo'
+    bnode: BNode = BNode("foo")
+
+    assert URIRef(bnode) == URIRef("foo")
+    assert bnode.n3() == "_:foo"
+    assert str(bnode) == "foo"
     assert bnode == BNode("foo")  # value object semantics for ==
     assert bnode is not BNode("foo")  # value object semantics for ==
-    assert URIRef('foo') is not URIRef('foo')  # different instances
-    assert URIRef(BNode("foo")) == URIRef("foo")    
-    assert BNode('foo') == BNode(URIRef('foo'))
+    assert URIRef("foo") is not URIRef("foo")  # different instances
+    assert URIRef(BNode("foo")) == URIRef("foo")
+    assert BNode("foo") == BNode(URIRef("foo"))
+
+
+def test_selct_subset_of_types():
+    NS42 = Namespace("https://ns42.org/")
+
+    g = Graph()
+
+    top_ten = g.resource(NS42.TopTen)
+    top_ten[RDFS.label] = Literal("Top Ten")
+    top_ten[RDF.type] = NS42.SocialComparator
+
+    peer_average = g.resource(NS42.PeerAverage)
+    peer_average[RDFS.label] = Literal("Peer Average")
+    peer_average[RDF.type] = NS42.SocialComparator
+
+    goal = g.resource(NS42.Goal)
+    goal[RDFS.label] = Literal("Goal")
+    goal[RDF.type] = NS42.GoalComparator
+
+    candidate1 = g.resource(BNode("candidate1"))
+    candidate1[NS42.regardingComparator] = top_ten.identifier
+
+    t = candidate1[NS42.regardingComparator / ~top_ten]
+
+    assert t == ""

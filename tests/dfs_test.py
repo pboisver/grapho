@@ -38,15 +38,15 @@ def test_with_measures():
             ["id", "passed", "total", "goal"],
             ["1", 4, 5, 10],
             ["2", 3, 6, 10],
-            ["3", 7, 10, 10]
-        ]
+            ["3", 7, 10, 10],
+        ],
     }
 
     data = input_message["perf_content"]
     df = DataFrame(data[1:], columns=data[0])
-    
-    df = df.set_index('id')
-    
+
+    df = df.set_index("id")
+
     df[0:1]
 
     pass

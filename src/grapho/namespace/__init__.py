@@ -2,6 +2,7 @@
 
 `AliasingDefinedNamespace` base class, and `PSDO`, `CPO`, and `SLOWMO` namespaces. These namespaces work the same way as the builtin RDF classes but allow for convenient aliases (e.g. labels) in code.
 """
+
 from rdflib.namespace import (
     _DFNS_RESERVED_ATTRS,
     DefinedNamespace,
@@ -13,8 +14,8 @@ from rdflib.term import URIRef
 class AliasingDefinedNamespaceMeta(DefinedNamespaceMeta):
     _fail = True  # Default is closed namepaces only: fail if neither attribute nor in _extras
 
-    _alias: dict[str,str] = {}
-    
+    _alias: dict[str, str] = {}
+
     _DFNS_RESERVED_ATTRS.add("_alias")
 
     def __getitem__(cls, name: str, default=None) -> URIRef:
@@ -54,12 +55,8 @@ class AliasingDefinedNamespace(
 
 
 # import at end to avoid circular reference when namespaces import `AliasingDefinedNamespace`
-from grapho.namespace._PSDO import PSDO   # noqa: E402
 from grapho.namespace._CPO import CPO  # noqa: E402
+from grapho.namespace._PSDO import PSDO  # noqa: E402
 from grapho.namespace._SLOWMO import SLOWMO  # noqa: E402
 
-_NAMESPACE_PREFIXES_PFP = {
-    "psdo": PSDO,
-    "cpo": CPO,
-    "slowmo": SLOWMO
-    }
+_NAMESPACE_PREFIXES_PFP = {"psdo": PSDO, "cpo": CPO, "slowmo": SLOWMO}

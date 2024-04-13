@@ -2,6 +2,7 @@ from rdflib import Namespace, URIRef
 
 from grapho.namespace import AliasingDefinedNamespace
 
+
 class CPO(AliasingDefinedNamespace):
     _NS = Namespace("http://purl.obolibrary.org/cpo/")
 

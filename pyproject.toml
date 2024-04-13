@@ -7,10 +7,31 @@ readme = "README.md"
 packages = [{include = "grapho", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-pytest = "^7.4.4"
+python = "^3.11"
 rdflib = "^7.0"
 loguru = "^0.7.2"
+pygithub = "^2.3.0"
+pydantic-settings = "^2.2.1"
+pydantic = "^2.6.4"
+python-dotenv = "^1.0.1"
+numpy = "^1.26.4"
+matplotlib = "^3.8.4"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+ruff = "^0.3.7"
+poethepoet = "^0.25.1"
+
+[tool.ruff.lint]
+extend-select = ["I", "C901"] # sort imports 
+mccabe.max-complexity = 5
+
+[tool.poe.tasks]
+ruff = [
+    {cmd = "ruff check --fix  --exit-zero"},
+    {cmd = "ruff format"}
+]
 
 
 [build-system]
