@@ -75,3 +75,42 @@ Source: Conversation with Bing, 4/11/2024
 (7) undefined. http://purl.org/dc/dcmitype/.
 (8) undefined. http://dublincore.org/specifications/dublin-core/dcmi-terms/2020-01-20/.
 (9) undefined. https://www.dublincore.org/specifications/dublin-core/dcmi-terms/release_history/.
+
+----
+
+Certainly! To estimate the standard deviation from the mean, 75th percentile (Q3), and 90th percentile, we can use the properties of a normal distribution. However, please note that this estimation assumes the data follows a normal distribution, which may not always be the case.
+
+Here's a Python function that uses the z-scores corresponding to the 75th and 90th percentiles to estimate the standard deviation:
+
+```python
+from scipy.stats import norm
+
+def estimate_std(mean, percentile_75, percentile_90):
+    # Z-scores for 75th and 90th percentile in a standard normal distribution
+    z_75 = norm.ppf(0.75)
+    z_90 = norm.ppf(0.90)
+
+    # Calculate the standard deviation using the z-scores and percentile values
+    std_estimated = (percentile_90 - mean) / z_90
+
+    # Alternatively, you could use the 75th percentile to estimate
+    # std_estimated_alt = (percentile_75 - mean) / z_75
+
+    return std_estimated
+
+# Example usage:
+mean = 50  # replace with your mean value
+percentile_75 = 60  # replace with your 75th percentile value
+percentile_90 = 70  # replace with your 90th percentile value
+
+estimated_std = estimate_std(mean, percentile_75, percentile_90)
+print(f"Estimated Standard Deviation: {estimated_std}")
+```
+
+Remember to replace `mean`, `percentile_75`, and `percentile_90` with your actual values. This function will give you an estimated standard deviation based on the provided percentiles. Keep in mind that the accuracy of this estimation heavily relies on the assumption that the data is normally distributed. If the data distribution is significantly different, the estimation may not be accurate.
+
+
+----
+
+
+
